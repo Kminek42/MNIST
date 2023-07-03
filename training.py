@@ -5,9 +5,11 @@ from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 import time
 
-dev = torch.device("mps")
+# this model is so simple that it is faster on CPU -----------------------------
+dev = torch.device("cpu")
 print(f"Using {dev} device.")
 
+# prepare data ----------------------------------------------------------------- 
 transform = torchvision.transforms.Compose(
     [torchvision.transforms.ToTensor(),
     torchvision.transforms.Normalize((0.5,), (0.5,))]
@@ -26,7 +28,7 @@ loader = DataLoader(
     shuffle=True
 )
 
-# model
+# model ------------------------------------------------------------------------
 input_n = 28 * 28
 
 hidden_n = 512
@@ -48,6 +50,8 @@ optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
 epoch_n = 10
 
 t0 = time.time()
+
+# learning loop ----------------------------------------------------------------
 for epoch in range(1, epoch_n + 1):
     loss_sum = 0
     for inputs, targets in iter(loader):

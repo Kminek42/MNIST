@@ -23,6 +23,7 @@ model = torch.load("./model.pt").to("cpu")
 
 good = 0
 all = 0
+# checking all test images -----------------------------------------------------
 for inputs, targets in testing_dataset:
     # inputs, targets = inputs.to(dev), targets.to(dev) 
     outputs = model.forward(inputs)
