@@ -8,28 +8,28 @@ import time
 dev = torch.device("cpu")
 print(f"Using {dev} device.")
 
-transform = torchvision.transforms.Compose(
-    [torchvision.transforms.ToTensor(),
-    torchvision.transforms.Normalize((0.5,), (0.5,))]
-)
-
 testing_dataset = torchvision.datasets.MNIST(
     root="./MNIST",
     train=False,
     download=True,
-    transform=transform
+    transform=torchvision.transforms.ToTensor()
 )
-model = torch.load("./model.pt").to("cpu")
 
-good = 0
-all = 0
+loader = DataLoader(
+    dataset=testing_dataset,
+    batch_size=128,
+    shuffle=True
+)
+
+model = torch.load("./model.pt")
+
 # checking all test images -----------------------------------------------------
-for inputs, targets in testing_dataset:
-    # inputs, targets = inputs.to(dev), targets.to(dev) 
+all = 0
+good = 0
+for inputs, targets in iter(loader):
     outputs = model.forward(inputs)
-    if torch.argmax(outputs) == targets:
-        good += 1
-    
-    all += 1
+    good += (torch.argmax(outputs, dim=-1) == targets).sum()
+    all += targets.size(0)
+
 
 print(f"Accuracy: {good / all}")

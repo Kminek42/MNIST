@@ -10,16 +10,11 @@ dev = torch.device("cpu")
 print(f"Using {dev} device.")
 
 # prepare data ----------------------------------------------------------------- 
-transform = torchvision.transforms.Compose(
-    [torchvision.transforms.ToTensor(),
-    torchvision.transforms.Normalize((0.5,), (0.5,))]
-)
-
 training_dataset = torchvision.datasets.MNIST(
     root="./MNIST",
     train=True,
     download=True,
-    transform=transform
+    transform=torchvision.transforms.ToTensor()
 )
 
 loader = DataLoader(
@@ -31,9 +26,9 @@ loader = DataLoader(
 # model ------------------------------------------------------------------------
 input_n = 28 * 28
 
-hidden_n = 512
+hidden_n = 128
 output_n = 10
-activation = nn.LeakyReLU()
+activation = nn.Sigmoid()
 
 model = nn.Sequential(
     nn.Flatten(),
@@ -45,9 +40,9 @@ model = nn.Sequential(
 ).to(dev)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+optimizer = torch.optim.Adam(model.parameters(), lr=3e-3)
 
-epoch_n = 10
+epoch_n = 5
 
 t0 = time.time()
 
@@ -70,5 +65,5 @@ for epoch in range(1, epoch_n + 1):
     print(f"Epoch: {epoch}, mean loss: {loss_sum / len(loader)}")
     print(f"Learning time: {time.time() - t0}, Time remaining: {remaining_time}\n")
 
-torch.save(obj=model, f="model.pt")
+torch.save(obj=model.to('cpu'), f="model.pt")
 print("Model saved.")
